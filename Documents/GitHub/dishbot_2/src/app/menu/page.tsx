@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import {
     Card,
     CardContent,
@@ -15,10 +15,10 @@ import '../globals.css';
 import { Button } from "@/components/ui/button";
 import { XIcon, PanelRightOpenIcon } from "lucide-react";
 import { parseISO } from "date-fns";
+import MenuClient from "./MenuClient";
 
 export default function MenuPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
 
     const [username, setUsername] = useState<string | undefined>(undefined);
     const [date, setDate] = useState<Date | undefined>(new Date());
@@ -30,16 +30,6 @@ export default function MenuPage() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-
-    useEffect(() => {
-        const usernameParam = searchParams.get("username");
-        if (usernameParam) {
-            setUsername(usernameParam);
-            
-            // Check if user is admin
-            checkIfAdmin(usernameParam);
-        }
-    }, [searchParams]);
     
     const checkIfAdmin = async (username: string) => {
         setIsLoading(true);
@@ -160,6 +150,14 @@ export default function MenuPage() {
                     </div>
                 </div>
             )}
+
+            <Suspense fallback={null}>
+                <MenuClient onUsernameFound={(username) => {
+                    setUsername(username);
+                    checkIfAdmin(username);
+                }} />
+            </Suspense>
         </div>
+        
     );
 }
