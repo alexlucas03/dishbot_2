@@ -77,6 +77,8 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        console.log(availabilities)
+
         return NextResponse.json({ 
             success: true,
             availabilities
