@@ -5,11 +5,15 @@ import '../globals.css';
 export default function ScheduleCalendar({
     date,
     setDate,
-    onAvailabilitiesChange
+    onAvailabilitiesChange,
+    startDate,
+    endDate
 }: {
     date: Date | undefined;
     setDate: (date: Date | undefined) => void;
     onAvailabilitiesChange: (availabilities: Record<number, number>) => void;
+    startDate?: Date;
+    endDate?: Date;
 }) {
     const [availabilities, setAvailabilities] = useState<Record<number, number>>({});
     const [rangeStart, setRangeStart] = useState<Date | null>(null);

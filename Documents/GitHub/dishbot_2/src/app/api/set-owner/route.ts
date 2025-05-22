@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Update admin status in database (transaction to ensure atomicity)
-        await prisma.$transaction(async (prisma) => {
+        await prisma.$transaction(async (prisma: any) => {
             // If there was a previous admin, set them to non-admin
             if (currentAdmin) {
                 await prisma.people2.update({

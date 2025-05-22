@@ -37,7 +37,7 @@ export async function GET() {
         const people = await prisma.people2.findMany();
 
         const ownerMap = new Map(
-            people.map(p => [p.name, p.groupmeid])
+            people.map((p: { name: any; groupmeid: any; }) => [p.name, p.groupmeid])
         );
 
         const formatted = dishes.map((dish: { owner: string; type: any; }) => {

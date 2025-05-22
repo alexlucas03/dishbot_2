@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
         const people = await prisma.people2.findMany();
         
         // Separate admins and non-admins
-        const admins = people.filter(p => p.admin);
-        const nonAdmins = people.filter(p => !p.admin).sort(
-            (a, b) => parseInt(a.pickorder) - parseInt(b.pickorder)
+        const admins = people.filter((p: { admin: any; }) => p.admin);
+        const nonAdmins = people.filter((p: { admin: any; }) => !p.admin).sort(
+            (a: { pickorder: string; }, b: { pickorder: string; }) => parseInt(a.pickorder) - parseInt(b.pickorder)
         );
 
         console.log(`Found ${admins.length} admins and ${nonAdmins.length} non-admins`);

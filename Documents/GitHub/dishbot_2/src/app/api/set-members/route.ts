@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         });
 
         const adminMap: Record<string, boolean> = {};
-        existingPeople.forEach(p => {
+        existingPeople.forEach((p: { groupmeid: string | number; admin: boolean; }) => {
             adminMap[p.groupmeid] = p.admin;
         });
 
