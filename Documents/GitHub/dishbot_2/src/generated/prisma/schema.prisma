@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DB_LINK")
+  directUrl = env("DIRECT_LINK")
+}
+
+model admin {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(255)
+  password String @db.VarChar(255)
+}
+
+model january {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model february {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model march {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model april {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model may {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model june {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model july {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model august {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model september {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model october {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model november {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model december {
+  id    String @id @db.VarChar(255)
+  year  String @db.VarChar(255)
+  day   String @db.VarChar(255)
+  owner String @db.VarChar(255)
+  type  String @db.VarChar(255)
+}
+
+model people2 {
+  groupmeid   String  @id @db.VarChar(255)
+  name        String  @unique @db.VarChar(255)
+  username    String  @db.VarChar(255)
+  pickorder   String  @db.VarChar(255)
+  totalpoints String  @db.VarChar(255)
+  admin       Boolean
+}
+
+model startend2 {
+  id   Int      @id
+  date DateTime
+}
