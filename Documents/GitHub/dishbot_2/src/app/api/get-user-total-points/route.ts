@@ -1,3 +1,4 @@
+// /api/get-user-total-points
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 
@@ -5,15 +6,25 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const username = body.username;
-        console.log(username)
+        console.log('Looking for username:', username);
         
         const thisUser = await prisma.people2.findFirst({
-            where: { name: username}
+            where: { username: username }
         });
 
-        const userTotalPoints = thisUser?.totalpoints;
+        console.log('Found user:', thisUser);
+        
+        if (!thisUser) {
+            console.log('No user found with username:', username);
+            return NextResponse.json({ 
+                success: false,
+                error: "User not found",
+                userTotalPoints: 0
+            });
+        }
 
-        console.log(userTotalPoints)
+        const userTotalPoints = parseInt(thisUser.totalpoints) || 0;
+        console.log('User total points (converted):', userTotalPoints);
 
         return NextResponse.json({ 
             success: true,
