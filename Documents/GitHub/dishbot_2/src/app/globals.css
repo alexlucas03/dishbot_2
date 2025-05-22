@@ -129,3 +129,18 @@ th[aria-label="Saturday"] {
     display: flex;
     flex-direction: row;
 }
+
+.availability-available {
+    background-color: #10b981 !important;
+    color: white;
+}
+
+.availability-limited {
+    background-color: #eab308 !important;
+    color: white;
+}
+
+.availability-unavailable {
+    background-color: #ef4444 !important;
+    color: white;
+}

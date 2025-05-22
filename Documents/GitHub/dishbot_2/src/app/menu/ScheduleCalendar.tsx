@@ -126,14 +126,10 @@ export default function ScheduleCalendar({
 
     function getAvailabilityColor(availability: number): string {
         switch (availability) {
-            case 0:
-                return 'bg-green-500';
-            case 1:
-                return 'bg-yellow-500';
-            case 2:
-                return 'bg-red-500';
-            default:
-                return '';
+            case 0: return 'availability-available';
+            case 1: return 'availability-limited';
+            case 2: return 'availability-unavailable';
+            default: return '';
         }
     }
 
