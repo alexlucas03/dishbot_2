@@ -76,6 +76,8 @@ export default function ScheduleCalendar({
     }, [date, rangeStart, rangeEnd]);
 
     useEffect(() => {
+        if (typeof window === "undefined") return;
+
         const buttons = document.querySelectorAll('button[role="gridcell"][name="day"]');
         buttons.forEach(button => {
             const day = parseInt(button.textContent?.trim() || '', 10);
@@ -87,6 +89,7 @@ export default function ScheduleCalendar({
             }
         });
     }, [availabilities]);
+
 
     async function monthChange() {
         await new Promise((resolve) => setTimeout(resolve, 0));
