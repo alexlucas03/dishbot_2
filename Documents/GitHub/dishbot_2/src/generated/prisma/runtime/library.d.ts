@@ -2338,7 +2338,7 @@ export declare const objectEnumValues: {
     };
 };
 
-declare const officialPrismaAdapters: readonly ["@prisma/adapter-planetscale", "@prisma/adapter-neon", "@prisma/adapter-libsql", "@prisma/adapter-d1", "@prisma/adapter-pg", "@prisma/adapter-pg-worker"];
+declare const officialPrismaAdapters: readonly ["@prisma/adapter-planetscale", "@prisma/adapter-neon", "@prisma/adapter-libsql", "@prisma/adapter-d1"];
 
 export declare type Omission = Record<string, boolean | Skip>;
 
