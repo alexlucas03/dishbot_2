@@ -24,8 +24,11 @@ export async function GET() {
     try {
         const today = new Date();
         const year = today.getFullYear().toString();
-        const day = today.getDate().toString().padStart(2, "0");
         const month = today.getMonth() + 1;
+
+        const now = new Date();
+        now.setHours(now.getHours() - 8);
+        const day = now.getDate().toString().padStart(2, "0");
 
         const model = monthMap[month];
         if (!model) throw new Error("Invalid month model");
@@ -37,7 +40,7 @@ export async function GET() {
         const people = await prisma.people2.findMany();
 
         const ownerMap = new Map(
-            people.map((p: { name: any; groupmeid: any; }) => [p.name, p.groupmeid])
+            people.map((p: { username: any; groupmeid: any; }) => [p.username, p.groupmeid])
         );
 
         const formatted = dishes.map((dish: { owner: string; type: any; }) => {
