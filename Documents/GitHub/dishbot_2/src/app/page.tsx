@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, getMonth, getYear, addMonths, subMonths, startOfWeek, endOfWeek, isSameDay } from "date-fns";
 import axios from "axios";
@@ -116,19 +116,20 @@ export default function DishCalendar() {
           const initials = appointmentsForDay.map(d => d.owner.split(" ").map((s: string) => s[0]).join(""));
 
           return (
-            <div key={idx} className="border rounded h-24 p-1 text-sm">
-              <div
-                className={`font-semibold cursor-pointer ${isCurrentMonth ? "text-black" : "text-gray-400"}`}
-                onClick={() => isCurrentMonth && appointmentsForDay.length > 0 && handleClick(dayNum)}
-              >
-                {dayNum}
-              </div>
-              {isCurrentMonth && appointmentsForDay.length > 0 && (
-                <div className="text-xs text-gray-600 mt-1">
-                  {initials.join(", ")}
-                </div>
-              )}
-            </div>
+            <Card
+              key={idx}
+              className={`h-28 p-2 flex flex-col justify-between cursor-pointer ${!isCurrentMonth ? 'opacity-40' : ''}`}
+              onClick={() => isCurrentMonth && appointmentsForDay.length > 0 && handleClick(dayNum)}
+            >
+              <CardContent className="p-0">
+                <div className="font-semibold text-sm">{dayNum}</div>
+                {isCurrentMonth && appointmentsForDay.length > 0 && (
+                  <div className="text-xs text-gray-600 mt-2">
+                    {initials.join(", ")}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           );
         })}
       </div>
