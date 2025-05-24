@@ -113,7 +113,7 @@ export default function AppointmentTable({
                             <TableCell className="font-medium">{item.type}</TableCell>
                             <TableCell>
                                 {
-                                    item.owner !== 'null' 
+                                    item.owner !== 'null'
                                     ? item.owner
                                     : isClaimable(date) ? (
                                         <Button 

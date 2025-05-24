@@ -4,41 +4,35 @@ import { format } from "date-fns";
 
 export async function GET(request: NextRequest) {
     try {
-        // Get all users from the database
+        // Get all non-admin users with names
         const users = await prisma.people2.findMany({
             where: {
                 admin: false
             },
             select: {
                 username: true,
+                name: true,
                 totalpoints: true,
                 pickorder: true
             }
         });
 
         // Get start and end date records
-        const startDateRecord = await prisma.startend2.findFirst({
-            where: { id: 1 }
-        });
-        
-        const endDateRecord = await prisma.startend2.findFirst({
-            where: { id: 2 }
-        });
-        
+        const startDateRecord = await prisma.startend2.findFirst({ where: { id: 1 } });
+        const endDateRecord = await prisma.startend2.findFirst({ where: { id: 2 } });
+
         if (!startDateRecord?.date || !endDateRecord?.date) {
             return NextResponse.json({ error: "Start or end date not found" }, { status: 400 });
         }
-        
-        // Initialize results array
+
         const results = [];
-        
-        // Extract months from date objects
+
         const startDate = new Date(startDateRecord.date);
         const endDate = new Date(endDateRecord.date);
         const startMonth = startDate.getMonth() + 1;
         const endMonth = endDate.getMonth() + 1;
 
-        const modelMap: Record<string, any> = {
+        const modelMap: Record<number, any> = {
             1: prisma.january,
             2: prisma.february,
             3: prisma.march,
@@ -53,19 +47,17 @@ export async function GET(request: NextRequest) {
             12: prisma.december,
         };
 
-        // Process each user
         for (const user of users) {
-            let dishes: any = [];
-            
-            // Get all dishes for this user across all relevant months
+            let dishes: any[] = [];
+
             for (let i = startMonth; i <= endMonth; i++) {
                 const model = modelMap[i];
                 if (!model) continue;
-                
+
                 const dishesByMonth = await model.findMany({
                     where: { owner: user.username }
                 });
-                
+
                 dishes = [
                     ...dishes,
                     ...dishesByMonth.map((dish: any) => ({
@@ -74,39 +66,29 @@ export async function GET(request: NextRequest) {
                     }))
                 ];
             }
-            
-            // Calculate points earned from dishes
+
+            // Calculate earned points
             let earnedPoints = 0;
             for (const dish of dishes) {
                 const dishDate = new Date(dish.year, dish.month - 1, dish.day);
                 const dishDay = format(dishDate, 'EEEE');
-                
+
                 if (dishDay !== 'Sunday') {
-                    if (dish.type === 'dinner' || dish.type === 'lunch') {
-                        earnedPoints += 2;
-                    } else {
-                        earnedPoints += 1;
-                    }
+                    earnedPoints += (dish.type === 'dinner' || dish.type === 'lunch') ? 2 : 1;
                 } else {
-                    if (dish.type === 'dinner') {
-                        earnedPoints += 3;
-                    } else {
-                        earnedPoints += 1;
-                    }
+                    earnedPoints += (dish.type === 'dinner') ? 3 : 1;
                 }
             }
-            
-            // Add user to results
+
             results.push({
-                name: user.username,
+                name: user.name, // use full name
                 totalPoints: parseInt(user.totalpoints || '0'),
                 earnedPoints: earnedPoints,
                 differential: parseInt(user.totalpoints || '0') - earnedPoints,
                 pickOrder: parseInt(user.pickorder || '0')
             });
         }
-        
-        // Sort results by pickOrder
+
         results.sort((a, b) => a.pickOrder - b.pickOrder);
 
         return NextResponse.json({
