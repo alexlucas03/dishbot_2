@@ -60,11 +60,16 @@ export async function POST(request: NextRequest) {
             success: true,
             dishes: dishes
                 .sort((a: any, b: any) => a.id - b.id)
-                .map((dish: any) => ({
-                    date: new Date(dish.year, dish.month - 1, dish.day),
-                    type: dish.type,
-                    id: dish.id
-                }))
+                .map((dish: any) => {
+                    const date = new Date(dish.year, dish.month - 1, dish.day);
+                    date.setDate(date.getDate() + 1);
+                    return {
+                        date,
+                        type: dish.type,
+                        id: dish.id
+                    };
+                })
+
         });
     } catch (error) {
         console.error("API error:", error);
