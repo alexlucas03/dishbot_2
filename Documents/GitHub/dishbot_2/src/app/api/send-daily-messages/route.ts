@@ -22,12 +22,11 @@ const monthMap: Record<number, any> = {
 
 export async function GET() {
     try {
-        const today = new Date();
-        const year = today.getFullYear().toString();
-        const month = today.getMonth() + 1;
-
         const now = new Date();
-        now.setHours(now.getHours() - 8);
+        now.setHours(now.getHours() - 8); // Adjust timezone
+
+        const year = now.getFullYear().toString();
+        const month = now.getMonth() + 1;
         const day = now.getDate().toString().padStart(2, "0");
 
         const model = monthMap[month];
@@ -39,29 +38,43 @@ export async function GET() {
 
         const people = await prisma.people2.findMany();
 
+        // Map usernames to { name, groupmeid }
         const ownerMap = new Map(
-            people.map((p: { username: any; groupmeid: any; }) => [p.username, p.groupmeid])
+            people.map((p: { username: string; name: string; groupmeid: string }) => [
+                p.username,
+                { name: p.name, groupmeid: p.groupmeid }
+            ])
         );
 
-        const formatted = dishes.map((dish: { owner: string; type: any; }) => {
-            const groupmeId = ownerMap.get(dish.owner);
-            const mention = groupmeId ? `${dish.owner}` : "(unassigned)";
-            return `${dish.type}: ${mention}`;
+        // Build formatted lines and mention indices
+        let currentIndex = `Today's Dishes (${format(now, "MMMM do, yyyy")}):\n`.length;
+        const groupmeIds: string[] = [];
+        const indices: [number, number][] = [];
+
+        const formattedLines = dishes.map((dish: { owner: string; type: string }) => {
+            const ownerInfo = ownerMap.get(dish.owner);
+            const visibleName = ownerInfo?.name || "(unassigned)";
+            const line = `${dish.type}: ${visibleName}`;
+
+            if (ownerInfo?.groupmeid) {
+                groupmeIds.push(ownerInfo.groupmeid);
+                indices.push([
+                    currentIndex + dish.type.length + 2, // after "type: "
+                    currentIndex + dish.type.length + 2 + visibleName.length
+                ]);
+            }
+
+            currentIndex += line.length + 1; // +1 for newline
+            return line;
         });
 
-        const groupmeIds = dishes
-            .map((dish: { owner: string }) => ownerMap.get(dish.owner))
-            .filter((id: any): id is string => Boolean(id));
-
-        const indices = groupmeIds.map((_: any, i: number) => [i, i + 1] as [number, number]);
-
-        const messageText = `Today's Dishes (${format(today, "MMMM do, yyyy")}):\n` + formatted.join("\n");
+        const messageText = `Today's Dishes (${format(now, "MMMM do, yyyy")}):\n` + formattedLines.join("\n");
 
         const messagePayload: any = {
             text: messageText
         };
 
-        if (indices.length > 0) {
+        if (groupmeIds.length > 0) {
             messagePayload.attachments = [
                 {
                     type: "mentions",
