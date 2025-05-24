@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
                 admin: false
             },
             select: {
-                name: true,
+                username: true,
                 totalpoints: true,
                 pickorder: true
             }
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
                 if (!model) continue;
                 
                 const dishesByMonth = await model.findMany({
-                    where: { owner: user.name }
+                    where: { owner: user.username }
                 });
                 
                 dishes = [
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
             
             // Add user to results
             results.push({
-                name: user.name,
+                name: user.username,
                 totalPoints: parseInt(user.totalpoints || '0'),
                 earnedPoints: earnedPoints,
                 differential: parseInt(user.totalpoints || '0') - earnedPoints,
