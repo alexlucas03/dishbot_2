@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, getMonth, getYear, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, getMonth, getYear, addMonths, subMonths, startOfWeek, endOfWeek, isSameDay } from "date-fns";
 import axios from "axios";
+
+const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function DishCalendar() {
   const [days, setDays] = useState<Date[]>([]);
@@ -20,9 +22,14 @@ export default function DishCalendar() {
   const year = getYear(currentDate);
 
   useEffect(() => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+
     const allDays = eachDayOfInterval({
-      start: startOfMonth(currentDate),
-      end: endOfMonth(currentDate)
+      start: calendarStart,
+      end: calendarEnd
     });
     setDays(allDays);
 
@@ -30,6 +37,7 @@ export default function DishCalendar() {
       const dailyAppointments: Record<number, any[]> = {};
 
       for (const day of allDays) {
+        if (getMonth(day) + 1 !== month) continue;
         const dayNum = getDate(day);
         const response = await fetch("/api/get-appointments", {
           method: "POST",
@@ -38,7 +46,7 @@ export default function DishCalendar() {
         });
 
         const data = await response.json();
-        if (data.success) {
+        if (data.success && data.dishInstances.length > 0) {
           dailyAppointments[dayNum] = data.dishInstances;
         }
       }
@@ -94,20 +102,33 @@ export default function DishCalendar() {
         />
       </div>
 
+      <div className="grid grid-cols-7 gap-2 mb-2 text-center font-semibold">
+        {weekdayLabels.map((label, idx) => (
+          <div key={idx}>{label}</div>
+        ))}
+      </div>
+
       <div className="grid grid-cols-7 gap-2">
-        {days.map((day) => {
+        {days.map((day, idx) => {
           const dayNum = getDate(day);
-          const initials = (appointments[dayNum] || [])
-            .map(d => d.owner.split(" ").map((s: string) => s[0]).join(""));
+          const isCurrentMonth = getMonth(day) + 1 === month;
+          const appointmentsForDay = appointments[dayNum] || [];
+          const initials = appointmentsForDay.map(d => d.owner.split(" ").map((s: string) => s[0]).join(""));
+
           return (
-            <Card
-              key={dayNum}
-              className="p-2 cursor-pointer hover:bg-blue-100"
-              onClick={() => handleClick(dayNum)}
-            >
-              <div className="font-semibold">{dayNum}</div>
-              <div className="text-sm text-gray-600">{initials.join(", ")}</div>
-            </Card>
+            <div key={idx} className="border rounded h-24 p-1 text-sm">
+              <div
+                className={`font-semibold cursor-pointer ${isCurrentMonth ? "text-black" : "text-gray-400"}`}
+                onClick={() => isCurrentMonth && appointmentsForDay.length > 0 && handleClick(dayNum)}
+              >
+                {dayNum}
+              </div>
+              {isCurrentMonth && appointmentsForDay.length > 0 && (
+                <div className="text-xs text-gray-600 mt-1">
+                  {initials.join(", ")}
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
