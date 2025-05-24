@@ -154,7 +154,7 @@ export default function UserTable({
                 </CardTitle>
             </Card>
             <Table>
-                <TableCaption>{username}</TableCaption>
+                <TableCaption>Double click a row to unclaim</TableCaption>
                 <TableHeader>
                     <TableRow>
                     <TableHead>Date</TableHead>

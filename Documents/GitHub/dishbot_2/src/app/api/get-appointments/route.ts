@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { month, day, year } = body as { month: string, day: string, year: string };
 
-        // Ensure we have valid inputs
         if (!month || !day || !year) {
             return NextResponse.json({ 
                 success: false,
@@ -30,7 +29,6 @@ export async function POST(request: NextRequest) {
         };
 
         const model = modelMap[month];
-        
         if (!model) {
             console.error(`Invalid month provided: ${month}`);
             return NextResponse.json({ 
@@ -40,13 +38,17 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`Searching for appointments on ${year}-${month}-${day}`);
-        
-        const dishInstances = await model.findMany({
-            where: { 
-                day: day,
-                year: year
-            }
-        });
+
+        const [dishInstances, people] = await Promise.all([
+            model.findMany({
+                where: { day, year }
+            }),
+            prisma.people2.findMany()
+        ]);
+
+        const usernameToName = new Map(
+            people.map(p => [p.username, p.name])
+        );
 
         console.log(`Found ${dishInstances.length} appointments`);
 
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
             success: true,
             dishInstances: dishInstances.map((dish: any) => ({
                 type: dish.type,
-                owner: dish.owner,
+                owner: usernameToName.get(dish.owner) || "(unknown)",
                 id: dish.id
             }))
         });        
@@ -65,8 +67,4 @@ export async function POST(request: NextRequest) {
             error: "Database error" 
         }, { status: 500 });
     }
-}
-
-export async function GET() {
-    return NextResponse.json({ message: 'hello' });
 }
